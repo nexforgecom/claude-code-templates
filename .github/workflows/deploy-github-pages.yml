@@ -31,14 +31,22 @@ jobs:
       - name: Install dependencies
         working-directory: ./dashboard
         run: |
-          npm ci --legacy-peer-deps  # Tambah --legacy-peer-deps kalau ada conflict deps
-          # Kalau ada error playwright/sharp, tambah: npx playwright install-deps --with-deps
+          npm --version
+          node --version
+          npm ci --legacy-peer-deps --verbose || npm install --legacy-peer-deps --verbose
 
       - name: Build Astro
         working-directory: ./dashboard
-        run: npm run build
+        run: npm run build -- --verbose
         env:
-          NODE_OPTIONS: --max-old-space-size=4096  # Tambah kalau memory error
+          NODE_OPTIONS: --max-old-space-size=4096
+
+      - name: Debug dist folder
+        if: always()
+        working-directory: ./dashboard
+        run: |
+          ls -la dist || echo "dist not created"
+          cat dist/index.html 2>/dev/null || echo "no index.html"
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
