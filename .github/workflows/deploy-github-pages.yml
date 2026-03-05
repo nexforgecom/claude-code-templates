@@ -30,11 +30,15 @@ jobs:
 
       - name: Install dependencies
         working-directory: ./dashboard
-        run: npm ci
+        run: |
+          npm ci --legacy-peer-deps  # Tambah --legacy-peer-deps kalau ada conflict deps
+          # Kalau ada error playwright/sharp, tambah: npx playwright install-deps --with-deps
 
       - name: Build Astro
         working-directory: ./dashboard
         run: npm run build
+        env:
+          NODE_OPTIONS: --max-old-space-size=4096  # Tambah kalau memory error
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
