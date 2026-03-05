@@ -1,11 +1,11 @@
 import { defineConfig } from 'astro/config';
 import react from '@astrojs/react';
-import vercel from '@astrojs/vercel';
 import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
-  output: 'server',
-  adapter: vercel(),
+  output: 'static',
+  base: '/claude-code-templates/',
+  site: 'https://username.github.io/claude-code-templates/',
   integrations: [react()],
   vite: {
     plugins: [tailwindcss()],
@@ -13,4 +13,5 @@ export default defineConfig({
       dedupe: ['react', 'react-dom'],
     },
   },
+  trailingSlash: 'always',
 });
