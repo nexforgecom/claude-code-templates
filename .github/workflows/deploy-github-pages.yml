@@ -33,20 +33,28 @@ jobs:
         run: |
           npm --version
           node --version
-          npm ci --legacy-peer-deps --verbose || npm install --legacy-peer-deps --verbose
+          if [ ! -f package-lock.json ]; then npm install --package-lock-only; fi
+          npm ci --legacy-peer-deps --force --verbose || npm install --legacy-peer-deps --force --verbose
+          npm ls
+
+      - name: Astro check
+        working-directory: ./dashboard
+        run: npx astro check || true
 
       - name: Build Astro
         working-directory: ./dashboard
         run: npm run build -- --verbose
         env:
-          NODE_OPTIONS: --max-old-space-size=4096
+          NODE_OPTIONS: --max-old-space-size=6144
+          DEBUG: astro*,vite*
 
-      - name: Debug dist folder
+      - name: Debug after build
         if: always()
         working-directory: ./dashboard
         run: |
-          ls -la dist || echo "dist not created"
-          cat dist/index.html 2>/dev/null || echo "no index.html"
+          ls -la dist || echo "No dist"
+          if [ -f dist/index.html ]; then head -n 20 dist/index.html; else echo "No index.html"; fi
+          cat package.json | head -n 20 || echo "No package.json"
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
